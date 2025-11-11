@@ -41,6 +41,87 @@ export function createHttpServer() {
   const app = express();
   let webServerInstance: Awaited<ReturnType<typeof createWebServer>> | null = null;
 
+  // Helper function to get tools list with schemas
+  function getToolsList() {
+    return [
+      {
+        name: "plan_task",
+        description: "Plan and analyze a task",
+        inputSchema: zodToJsonSchema(planTaskSchema),
+      },
+      {
+        name: "analyze_task",
+        description: "Analyze task requirements",
+        inputSchema: zodToJsonSchema(analyzeTaskSchema),
+      },
+      {
+        name: "reflect_task",
+        description: "Reflect on task quality",
+        inputSchema: zodToJsonSchema(reflectTaskSchema),
+      },
+      {
+        name: "split_tasks",
+        description: "Split task into subtasks",
+        inputSchema: zodToJsonSchema(splitTasksRawSchema),
+      },
+      {
+        name: "list_tasks",
+        description: "List all tasks",
+        inputSchema: zodToJsonSchema(listTasksSchema),
+      },
+      {
+        name: "execute_task",
+        description: "Execute a task",
+        inputSchema: zodToJsonSchema(executeTaskSchema),
+      },
+      {
+        name: "verify_task",
+        description: "Verify task completion",
+        inputSchema: zodToJsonSchema(verifyTaskSchema),
+      },
+      {
+        name: "delete_task",
+        description: "Delete a task",
+        inputSchema: zodToJsonSchema(deleteTaskSchema),
+      },
+      {
+        name: "clear_all_tasks",
+        description: "Clear all tasks",
+        inputSchema: zodToJsonSchema(clearAllTasksSchema),
+      },
+      {
+        name: "update_task",
+        description: "Update task content",
+        inputSchema: zodToJsonSchema(updateTaskContentSchema),
+      },
+      {
+        name: "query_task",
+        description: "Search tasks",
+        inputSchema: zodToJsonSchema(queryTaskSchema),
+      },
+      {
+        name: "get_task_detail",
+        description: "Get task details",
+        inputSchema: zodToJsonSchema(getTaskDetailSchema),
+      },
+      {
+        name: "process_thought",
+        description: "Process chain of thought",
+        inputSchema: zodToJsonSchema(processThoughtSchema),
+      },
+      {
+        name: "init_project_rules",
+        description: "Initialize project rules",
+        inputSchema: zodToJsonSchema(initProjectRulesSchema),
+      },
+      {
+        name: "research_mode",
+        description: "Enter research mode",
+        inputSchema: zodToJsonSchema(researchModeSchema),
+      },
+    ];
+  }
+
   // Middleware
   app.use(cors());
   app.use(express.json());
@@ -105,83 +186,7 @@ export function createHttpServer() {
 
       if (message.method === "tools/list") {
         // Return list of tools in MCP format with schemas
-        const tools = [
-          {
-            name: "plan_task",
-            description: "Plan and analyze a task",
-            inputSchema: zodToJsonSchema(planTaskSchema),
-          },
-          {
-            name: "analyze_task",
-            description: "Analyze task requirements",
-            inputSchema: zodToJsonSchema(analyzeTaskSchema),
-          },
-          {
-            name: "reflect_task",
-            description: "Reflect on task quality",
-            inputSchema: zodToJsonSchema(reflectTaskSchema),
-          },
-          {
-            name: "split_tasks",
-            description: "Split task into subtasks",
-            inputSchema: zodToJsonSchema(splitTasksRawSchema),
-          },
-          {
-            name: "list_tasks",
-            description: "List all tasks",
-            inputSchema: zodToJsonSchema(listTasksSchema),
-          },
-          {
-            name: "execute_task",
-            description: "Execute a task",
-            inputSchema: zodToJsonSchema(executeTaskSchema),
-          },
-          {
-            name: "verify_task",
-            description: "Verify task completion",
-            inputSchema: zodToJsonSchema(verifyTaskSchema),
-          },
-          {
-            name: "delete_task",
-            description: "Delete a task",
-            inputSchema: zodToJsonSchema(deleteTaskSchema),
-          },
-          {
-            name: "clear_all_tasks",
-            description: "Clear all tasks",
-            inputSchema: zodToJsonSchema(clearAllTasksSchema),
-          },
-          {
-            name: "update_task",
-            description: "Update task content",
-            inputSchema: zodToJsonSchema(updateTaskContentSchema),
-          },
-          {
-            name: "query_task",
-            description: "Search tasks",
-            inputSchema: zodToJsonSchema(queryTaskSchema),
-          },
-          {
-            name: "get_task_detail",
-            description: "Get task details",
-            inputSchema: zodToJsonSchema(getTaskDetailSchema),
-          },
-          {
-            name: "process_thought",
-            description: "Process chain of thought",
-            inputSchema: zodToJsonSchema(processThoughtSchema),
-          },
-          {
-            name: "init_project_rules",
-            description: "Initialize project rules",
-            inputSchema: zodToJsonSchema(initProjectRulesSchema),
-          },
-          {
-            name: "research_mode",
-            description: "Enter research mode",
-            inputSchema: zodToJsonSchema(researchModeSchema),
-          },
-        ];
+        const tools = getToolsList();
         res.json({
           jsonrpc: "2.0",
           id: message.id,
@@ -362,12 +367,14 @@ export function createHttpServer() {
           res.json({
             jsonrpc: "2.0",
             id: message.id,
-            result: result.content || [
-              {
-                type: "text",
-                text: JSON.stringify(result, null, 2),
-              },
-            ],
+            result: {
+              content: result.content || [
+                {
+                  type: "text",
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            },
           });
         } catch (error) {
           res.json({
@@ -423,26 +430,10 @@ export function createHttpServer() {
   });
 
   // MCP Protocol endpoints
-  // List all available tools
+  // List all available tools (REST endpoint with full schemas)
   app.get("/mcp/tools", async (req: Request, res: Response) => {
     try {
-      const tools = [
-        { name: "plan_task", description: "Plan and analyze a task" },
-        { name: "analyze_task", description: "Analyze task requirements" },
-        { name: "reflect_task", description: "Reflect on task quality" },
-        { name: "split_tasks", description: "Split task into subtasks" },
-        { name: "list_tasks", description: "List all tasks" },
-        { name: "execute_task", description: "Execute a task" },
-        { name: "verify_task", description: "Verify task completion" },
-        { name: "delete_task", description: "Delete a task" },
-        { name: "clear_all_tasks", description: "Clear all tasks" },
-        { name: "update_task", description: "Update task content" },
-        { name: "query_task", description: "Search tasks" },
-        { name: "get_task_detail", description: "Get task details" },
-        { name: "process_thought", description: "Process chain of thought" },
-        { name: "init_project_rules", description: "Initialize project rules" },
-        { name: "research_mode", description: "Enter research mode" },
-      ];
+      const tools = getToolsList();
       res.json({ tools });
     } catch (error) {
       res.status(500).json({
@@ -645,18 +636,7 @@ export function createHttpServer() {
           return;
       }
 
-      // MCP protocol response format
-      res.json({
-        content: result.content || [
-          {
-            type: "text",
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      });
-
-      // Trigger Web UI update if tasks were modified
-      // Trigger Web UI update if tasks were modified
+      // Trigger Web UI update if tasks were modified (before sending response)
       const tasksModifyingTools = [
         "plan_task",
         "analyze_task",
@@ -672,6 +652,16 @@ export function createHttpServer() {
       if (webServerInstance && tasksModifyingTools.includes(name)) {
         webServerInstance.sendSseUpdate();
       }
+
+      // MCP protocol response format (REST endpoint - returns content directly)
+      res.json({
+        content: result.content || [
+          {
+            type: "text",
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      });
     } catch (error) {
       const errorMsg =
         error instanceof Error ? error.message : String(error);
