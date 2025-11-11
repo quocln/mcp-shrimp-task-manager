@@ -1,7 +1,5 @@
 /**
- * planTask prompt 生成器
  * planTask prompt generator
- * 負責將模板和參數組合成最終的 prompt
  * Responsible for combining templates and parameters into the final prompt
  */
 import {
@@ -11,7 +9,6 @@ import {
 } from "../loader.js";
 import { Task, TaskDependency } from "../../types/index.js";
 /**
- * planTask prompt 參數介面
  * planTask prompt parameters interface
  */
 export interface PlanTaskPromptParams {
@@ -23,11 +20,8 @@ export interface PlanTaskPromptParams {
   memoryDir: string;
 }
 /**
- * 獲取 planTask 的完整 prompt
  * Get the complete prompt for planTask
- * @param params prompt 參數
  * @param params prompt parameters
- * @returns 生成的 prompt
  * @returns generated prompt
  */
 export async function getPlanTaskPrompt(
@@ -64,7 +58,7 @@ export async function getPlanTaskPrompt(
           }
         });
         if (params.completedTasks.length > 10) {
-          completeTasksContent += `\n\n*（僅顯示前10個，共 ${params.completedTasks.length} 個）*\n`;
+          completeTasksContent += `\n\n*(Showing first 10 of ${params.completedTasks.length} total)*\n`;
         }
       }
       let unfinishedTasksContent = "no pending tasks";

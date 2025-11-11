@@ -4,9 +4,6 @@ import {
   loadPromptFromTemplate,
 } from "../loader.js";
 /**
- * clearAllTasks prompt 參數介面
- */
-/**
  * clearAllTasks prompt parameter interface
  */
 export interface ClearAllTasksPromptParams {
@@ -16,11 +13,6 @@ export interface ClearAllTasksPromptParams {
   backupFile?: string;
   isEmpty?: boolean;
 }
-/**
- * 獲取 clearAllTasks 的完整 prompt
- * @param params prompt 參數
- * @returns 生成的 prompt
- */
 /**
  * Get complete prompt for clearAllTasks
  * @param params prompt parameters

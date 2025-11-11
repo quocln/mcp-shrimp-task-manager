@@ -1,7 +1,5 @@
 /**
- * verifyTask prompt 生成器
  * verifyTask prompt generator
- * 負責將模板和參數組合成最終的 prompt
  * Responsible for combining templates and parameters into the final prompt
  */
 import {
@@ -16,13 +14,9 @@ export interface VerifyTaskPromptParams {
   summary: string;
 }
 /**
- * 提取摘要內容
  * Extract summary content
- * @param content 原始內容
  * @param content Original content
- * @param maxLength 最大長度
  * @param maxLength Maximum length
- * @returns 提取的摘要
  * @returns Extracted summary
  */
 function extractSummary(
@@ -36,11 +30,8 @@ function extractSummary(
   return content.substring(0, maxLength) + "...";
 }
 /**
- * 獲取 verifyTask 的完整 prompt
  * Get the complete prompt for verifyTask
- * @param params prompt 參數
  * @param params prompt parameters
- * @returns 生成的 prompt
  * @returns Generated prompt
  */
 export async function getVerifyTaskPrompt(

@@ -9,28 +9,49 @@ import {
  */
 export const processThoughtSchema = z.object({
   thought: z
-    .string()
+    .string({
+      required_error: "thought is required",
+      invalid_type_error: "thought must be a string",
+    })
     .min(1, {
       message: "Thought content cannot be empty, please provide valid thinking content",
     })
     .describe("Thought content"),
   thought_number: z
-    .number()
-    .int()
+    .number({
+      required_error: "thought_number is required",
+      invalid_type_error: "thought_number must be a number",
+    })
+    .int({
+      message: "thought_number must be an integer",
+    })
     .positive({
       message: "Thought number must be a positive integer",
     })
     .describe("Current thought number"),
   total_thoughts: z
-    .number()
-    .int()
+    .number({
+      required_error: "total_thoughts is required",
+      invalid_type_error: "total_thoughts must be a number",
+    })
+    .int({
+      message: "total_thoughts must be an integer",
+    })
     .positive({
       message: "Total thoughts must be a positive integer",
     })
     .describe("Expected total number of thoughts, can be changed anytime if more thinking is needed"),
-  next_thought_needed: z.boolean().describe("Whether next thought is needed"),
+  next_thought_needed: z
+    .boolean({
+      required_error: "next_thought_needed is required",
+      invalid_type_error: "next_thought_needed must be a boolean",
+    })
+    .describe("Whether next thought is needed"),
   stage: z
-    .string()
+    .string({
+      required_error: "stage is required",
+      invalid_type_error: "stage must be a string",
+    })
     .min(1, {
       message: "Thinking stage cannot be empty, please provide a valid thinking stage",
     })

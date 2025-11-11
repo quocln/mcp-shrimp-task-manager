@@ -1,7 +1,5 @@
 /**
- * listTasks prompt 生成器
  * listTasks prompt generator
- * 負責將模板和參數組合成最終的 prompt
  * Responsible for combining templates and parameters into the final prompt
  */
 import {
@@ -11,7 +9,6 @@ import {
 } from "../loader.js";
 import { Task, TaskStatus } from "../../types/index.js";
 /**
- * listTasks prompt 參數介面
  * listTasks prompt parameters interface
  */
 export interface ListTasksPromptParams {
@@ -20,22 +17,20 @@ export interface ListTasksPromptParams {
   allTasks: Task[];
 }
 /**
- * 獲取 listTasks 的完整 prompt
  * Get the complete prompt for listTasks
- * @param params prompt 參數
  * @param params prompt parameters
- * @returns 生成的 prompt
  * @returns generated prompt
  */
 export async function getListTasksPrompt(
   params: ListTasksPromptParams
 ): Promise<string> {
   const { status, tasks, allTasks } = params;
+  
   if (allTasks.length === 0) {
     const notFoundTemplate = await loadPromptFromTemplate(
       "listTasks/notFound.md"
     );
-    const statusText = status === "all" ? "任何" : `任何 ${status} 的`;
+    const statusText = status === "all" ? "any" : `any ${status}`;
     return generatePrompt(notFoundTemplate, {
       statusText: statusText,
     });
@@ -43,7 +38,7 @@ export async function getListTasksPrompt(
   const statusCounts = Object.values(TaskStatus)
     .map((statusType) => {
       const count = tasks[statusType]?.length || 0;
-      return `- **${statusType}**: ${count} 個任務`;
+      return `- **${statusType}**: ${count} tasks`;
     })
     .join("\n");
   let filterStatus = "all";
@@ -69,7 +64,7 @@ export async function getListTasksPrompt(
       (filterStatus === "all" || filterStatus === statusType)
     ) {
       for (const task of tasksWithStatus) {
-        let dependencies = "沒有依賴";
+        let dependencies = "No dependencies";
         if (task.dependencies && task.dependencies.length > 0) {
           dependencies = task.dependencies
             .map((d) => `\`${d.taskId}\``)

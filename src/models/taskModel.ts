@@ -48,13 +48,14 @@ async function initGitIfNeeded(dataDir: string): Promise<void> {
     await fs.access(gitDir);
     // Git already initialized
   } catch {
-    // Initialize git repository
-    await execAsync(`cd "${dataDir}" && git init`);
-    await execAsync(`cd "${dataDir}" && git config user.name "Shrimp Task Manager"`);
-    await execAsync(`cd "${dataDir}" && git config user.email "shrimp@task-manager.local"`);
-    
-    // Create .gitignore
-    const gitignore = `# Temporary files
+    // Initialize git repository - wrap in try-catch to not block file operations
+    try {
+      await execAsync(`cd "${dataDir}" && git init`);
+      await execAsync(`cd "${dataDir}" && git config user.name "Shrimp Task Manager"`);
+      await execAsync(`cd "${dataDir}" && git config user.email "shrimp@task-manager.local"`);
+      
+      // Create .gitignore
+      const gitignore = `# Temporary files
 *.tmp
 *.log
 
@@ -62,11 +63,15 @@ async function initGitIfNeeded(dataDir: string): Promise<void> {
 .DS_Store
 Thumbs.db
 `;
-    await fs.writeFile(path.join(dataDir, '.gitignore'), gitignore);
-    
-    // Initial commit
-    await execAsync(`cd "${dataDir}" && git add .`);
-    await execAsync(`cd "${dataDir}" && git commit -m "Initial commit: Initialize task repository"`);
+      await fs.writeFile(path.join(dataDir, '.gitignore'), gitignore);
+      
+      // Initial commit
+      await execAsync(`cd "${dataDir}" && git add .`);
+      await execAsync(`cd "${dataDir}" && git commit -m "Initial commit: Initialize task repository"`);
+    } catch (error) {
+      // Silently fail - git is optional, don't block file operations
+      // Git might not be installed or there might be permission issues
+    }
   }
 }
 
@@ -144,15 +149,23 @@ async function writeTasks(tasks: Task[], commitMessage?: string): Promise<void> 
   const TASKS_FILE = await getTasksFilePath();
   const DATA_DIR = await getDataDir();
   
-  // Initialize git if needed
-  await initGitIfNeeded(DATA_DIR);
+  // Initialize git if needed (non-blocking - git is optional)
+  try {
+    await initGitIfNeeded(DATA_DIR);
+  } catch (error) {
+    // Git initialization failed, but continue with file write
+  }
   
-  // Write the tasks file
+  // Write the tasks file - this is the critical operation
   await fs.writeFile(TASKS_FILE, JSON.stringify({ tasks }, null, 2));
   
-  // Commit the changes
+  // Commit the changes (non-blocking - git is optional)
   if (commitMessage) {
-    await commitTaskChanges(DATA_DIR, commitMessage);
+    try {
+      await commitTaskChanges(DATA_DIR, commitMessage);
+    } catch (error) {
+      // Git commit failed, but file was already written
+    }
   }
 }
 
@@ -518,6 +531,11 @@ export async function batchCreateOrUpdateTasks(
   for (let i = 0; i < taskDataList.length; i++) {
     const taskData = taskDataList[i];
     const newTask = newTasks[i];
+    
+    // Safety check: ensure newTask exists
+    if (!newTask) {
+      continue; // Skip if task wasn't created (shouldn't happen, but safety check)
+    }
 
     // If dependencies exist, process them
     if (taskData.dependencies && taskData.dependencies.length > 0) {
@@ -560,7 +578,14 @@ export async function batchCreateOrUpdateTasks(
   const allTasks = [...tasksToKeep, ...newTasks];
 
   // Write updated task list
-  await writeTasks(allTasks, `Bulk task operation: ${updateMode} mode, ${newTasks.length} tasks`);
+  try {
+    await writeTasks(allTasks, `Bulk task operation: ${updateMode} mode, ${newTasks.length} tasks`);
+  } catch (error) {
+    // If file write fails, throw error with context
+    throw new Error(
+      `Failed to write tasks to file: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 
   return newTasks;
 }

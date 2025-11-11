@@ -273,6 +273,46 @@ export async function splitTasksRaw({
       allTasks = [...createdTasks]; // If retrieval fails, at least use the newly created tasks
     }
 
+    // If task creation failed, include error message in the main content
+    // Check if we actually had tasks to create but none were created
+    const hadTasksToCreate = convertedTasks.length > 0;
+    const noTasksCreated = createdTasks.length === 0;
+    
+    if (!actionSuccess || (hadTasksToCreate && noTasksCreated)) {
+      const errorText = `## Task Creation Failed\n\n${message || "Unknown error occurred during task creation"}\n\nPlease check the error message above and try again with corrected task data.`;
+      
+      // Still try to generate prompt if we have some tasks
+      let prompt = errorText;
+      if (createdTasks.length > 0) {
+        try {
+          const successPrompt = await getSplitTasksPrompt({
+            updateMode,
+            createdTasks,
+            allTasks,
+          });
+          prompt = errorText + "\n\n---\n\n" + successPrompt;
+        } catch (error) {
+          // If prompt generation fails, just show error
+        }
+      }
+      
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: prompt,
+          },
+        ],
+        ephemeral: {
+          taskCreationResult: {
+            success: actionSuccess,
+            message,
+            backupFilePath: backupFile,
+          },
+        },
+      };
+    }
+
     // Use prompt generator to get the final prompt
     const prompt = await getSplitTasksPrompt({
       updateMode,

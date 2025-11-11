@@ -197,16 +197,13 @@ async function main() {
       CallToolRequestSchema,
       async (request: CallToolRequest) => {
         try {
-          if (!request.params.arguments) {
-            throw new Error("No arguments provided");
-          }
+          // Allow undefined/null/empty arguments - let schema validation handle requirements
+          const args = request.params.arguments || {};
 
           let parsedArgs;
           switch (request.params.name) {
             case "plan_task":
-              parsedArgs = await planTaskSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await planTaskSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -214,9 +211,7 @@ async function main() {
               }
               return await planTask(parsedArgs.data);
             case "analyze_task":
-              parsedArgs = await analyzeTaskSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await analyzeTaskSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -224,9 +219,7 @@ async function main() {
               }
               return await analyzeTask(parsedArgs.data);
             case "reflect_task":
-              parsedArgs = await reflectTaskSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await reflectTaskSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -234,9 +227,7 @@ async function main() {
               }
               return await reflectTask(parsedArgs.data);
             case "split_tasks":
-              parsedArgs = await splitTasksRawSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await splitTasksRawSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -244,9 +235,7 @@ async function main() {
               }
               return await splitTasksRaw(parsedArgs.data);
             case "list_tasks":
-              parsedArgs = await listTasksSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await listTasksSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -254,9 +243,7 @@ async function main() {
               }
               return await listTasks(parsedArgs.data);
             case "execute_task":
-              parsedArgs = await executeTaskSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await executeTaskSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -264,9 +251,7 @@ async function main() {
               }
               return await executeTask(parsedArgs.data);
             case "verify_task":
-              parsedArgs = await verifyTaskSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await verifyTaskSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -274,9 +259,7 @@ async function main() {
               }
               return await verifyTask(parsedArgs.data);
             case "delete_task":
-              parsedArgs = await deleteTaskSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await deleteTaskSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -284,9 +267,7 @@ async function main() {
               }
               return await deleteTask(parsedArgs.data);
             case "clear_all_tasks":
-              parsedArgs = await clearAllTasksSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await clearAllTasksSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -294,9 +275,7 @@ async function main() {
               }
               return await clearAllTasks(parsedArgs.data);
             case "update_task":
-              parsedArgs = await updateTaskContentSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await updateTaskContentSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -304,9 +283,7 @@ async function main() {
               }
               return await updateTaskContent(parsedArgs.data);
             case "query_task":
-              parsedArgs = await queryTaskSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await queryTaskSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -314,9 +291,7 @@ async function main() {
               }
               return await queryTask(parsedArgs.data);
             case "get_task_detail":
-              parsedArgs = await getTaskDetailSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await getTaskDetailSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -324,9 +299,7 @@ async function main() {
               }
               return await getTaskDetail(parsedArgs.data);
             case "process_thought":
-              parsedArgs = await processThoughtSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await processThoughtSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
@@ -334,11 +307,16 @@ async function main() {
               }
               return await processThought(parsedArgs.data);
             case "init_project_rules":
+              // init_project_rules doesn't require arguments
+              parsedArgs = await initProjectRulesSchema.safeParseAsync(args);
+              if (!parsedArgs.success) {
+                throw new Error(
+                  `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`
+                );
+              }
               return await initProjectRules();
             case "research_mode":
-              parsedArgs = await researchModeSchema.safeParseAsync(
-                request.params.arguments
-              );
+              parsedArgs = await researchModeSchema.safeParseAsync(args);
               if (!parsedArgs.success) {
                 throw new Error(
                   `Invalid arguments for tool ${request.params.name}: ${parsedArgs.error.message}`

@@ -75,6 +75,15 @@ export function generatePrompt(
 }
 
 /**
+ * Get the current template language
+ * Always returns 'en' to ensure English-only output
+ * @returns Template language code (always 'en')
+ */
+export function getTemplateLanguage(): string {
+  return "en";
+}
+
+/**
  * Load prompt from template
  * @param templatePath Template path relative to template set root directory (e.g., 'chat/basic.md')
  * @returns Template content
@@ -83,45 +92,31 @@ export function generatePrompt(
 export async function loadPromptFromTemplate(
   templatePath: string
 ): Promise<string> {
-  const templateSetName = process.env.TEMPLATES_USE || "en";
+  // Always use English templates
+  const templateSetName = "en";
   const dataDir = await getDataDir();
   const builtInTemplatesBaseDir = __dirname;
 
   let finalPath = "";
   const checkedPaths: string[] = []; // Used for more detailed error reporting
 
-  // 1. Check custom paths in DATA_DIR
-  // path.resolve can handle cases where templateSetName is an absolute path
+  // 1. Check custom paths in DATA_DIR (only English)
   const customFilePath = path.resolve(dataDir, templateSetName, templatePath);
   checkedPaths.push(`Custom: ${customFilePath}`);
   if (fs.existsSync(customFilePath)) {
     finalPath = customFilePath;
   }
 
-  // 2. If custom path not found, check specific built-in template directory
+  // 2. Check English built-in template directory
   if (!finalPath) {
-    // Assume templateSetName for built-in templates is 'en', 'zh', etc.
     const specificBuiltInFilePath = path.join(
       builtInTemplatesBaseDir,
       `templates_${templateSetName}`,
       templatePath
     );
-    checkedPaths.push(`Specific Built-in: ${specificBuiltInFilePath}`);
+    checkedPaths.push(`Built-in (en): ${specificBuiltInFilePath}`);
     if (fs.existsSync(specificBuiltInFilePath)) {
       finalPath = specificBuiltInFilePath;
-    }
-  }
-
-  // 3. If specific built-in template is also not found and not 'en' (avoid duplicate checking)
-  if (!finalPath && templateSetName !== "en") {
-    const defaultBuiltInFilePath = path.join(
-      builtInTemplatesBaseDir,
-      "templates_en",
-      templatePath
-    );
-    checkedPaths.push(`Default Built-in ('en'): ${defaultBuiltInFilePath}`);
-    if (fs.existsSync(defaultBuiltInFilePath)) {
-      finalPath = defaultBuiltInFilePath;
     }
   }
 

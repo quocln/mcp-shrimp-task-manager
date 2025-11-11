@@ -1,6 +1,4 @@
 /**
- * executeTask prompt 生成器
- * 負責將模板和參數組合成最終的 prompt
  * executeTask prompt generator
  * Responsible for combining templates and parameters into the final prompt
  */
@@ -11,7 +9,6 @@ import {
 } from "../loader.js";
 import { Task, TaskStatus } from "../../types/index.js";
 /**
- * 任務複雜度評估的介面
  * Interface for task complexity assessment
  */
 interface ComplexityAssessment {
@@ -29,31 +26,25 @@ export interface ExecuteTaskPromptParams {
   dependencyTasks?: Task[];
 }
 /**
- * 獲取複雜度級別的樣式文字
  * Get styled text for complexity level
- * @param level 複雜度級別
  * @param level complexity level
- * @returns 樣式文字
  * @returns styled text
  */
 function getComplexityStyle(level: string): string {
   switch (level) {
     case "VERY_HIGH":
-      return "⚠️ **警告：此任務複雜度極高** ⚠️";
+      return "⚠️ **Warning: This task has extremely high complexity** ⚠️";
     case "HIGH":
-      return "⚠️ **注意：此任務複雜度較高**";
+      return "⚠️ **Note: This task has high complexity**";
     case "MEDIUM":
-      return "**提示：此任務具有一定複雜性**";
+      return "**Tip: This task has moderate complexity**";
     default:
       return "";
   }
 }
 /**
- * 獲取 executeTask 的完整 prompt
  * Get the complete prompt for executeTask
- * @param params prompt 參數
  * @param params prompt parameters
- * @returns 生成的 prompt
  * @returns generated prompt
  */
 export async function getExecuteTaskPrompt(
@@ -107,7 +98,7 @@ export async function getExecuteTaskPrompt(
       let dependencyTasksContent = "";
       for (const depTask of completedDependencyTasks) {
         dependencyTasksContent += `### ${depTask.name}\n${
-          depTask.summary || "*無完成摘要*"
+          depTask.summary || "*No completion summary*"
         }\n\n`;
       }
       dependencyTasksPrompt = generatePrompt(dependencyTasksTemplate, {
@@ -120,7 +111,7 @@ export async function getExecuteTaskPrompt(
   );
   let relatedFilesSummaryPrompt = "";
   relatedFilesSummaryPrompt = generatePrompt(relatedFilesSummaryTemplate, {
-    relatedFilesSummary: relatedFilesSummary || "當前任務沒有關聯的文件。",
+    relatedFilesSummary: relatedFilesSummary || "Current task has no related files.",
   });
   const complexityTemplate = await loadPromptFromTemplate(
     "executeTask/complexity.md"

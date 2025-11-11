@@ -1,7 +1,5 @@
 /**
- * researchMode prompt 生成器
  * researchMode prompt generator
- * 負責將模板和參數組合成最終的 prompt
  * Responsible for combining templates and parameters into the final prompt
  */
 import {
@@ -17,11 +15,8 @@ export interface ResearchModePromptParams {
   memoryDir: string;
 }
 /**
- * 獲取 researchMode 的完整 prompt
  * Get the complete researchMode prompt
- * @param params prompt 參數
  * @param params prompt parameters
- * @returns 生成的 prompt
  * @returns generated prompt
  */
 export async function getResearchModePrompt(
@@ -36,7 +31,7 @@ export async function getResearchModePrompt(
       previousState: params.previousState,
     });
   } else {
-    previousStateContent = "這是第一次進行此主題的研究，沒有之前的研究狀態。";
+    previousStateContent = "This is the first time researching this topic. There is no previous research state.";
   }
   const indexTemplate = await loadPromptFromTemplate("researchMode/index.md");
   let prompt = generatePrompt(indexTemplate, {

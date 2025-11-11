@@ -1,6 +1,4 @@
 /**
- * getTaskDetail prompt 生成器
- * 負責將模板和參數組合成最終的 prompt
  * getTaskDetail prompt generator
  * Responsible for combining templates and parameters into the final prompt
  */
@@ -16,11 +14,8 @@ export interface GetTaskDetailPromptParams {
   error?: string;
 }
 /**
- * 獲取 getTaskDetail 的完整 prompt
  * Get the complete prompt for getTaskDetail
- * @param params prompt 參數
  * @param params prompt parameters
- * @returns 生成的 prompt
  * @returns generated prompt
  */
 export async function getGetTaskDetailPrompt(
@@ -103,8 +98,8 @@ export async function getGetTaskDetailPrompt(
       "getTaskDetail/complatedSummary.md"
     );
     complatedSummaryPrompt = generatePrompt(complatedSummaryTemplate, {
-      completedTime: new Date(task.completedAt).toLocaleString("zh-TW"),
-      summary: task.summary || "*無完成摘要*",
+      completedTime: new Date(task.completedAt).toLocaleString("en-US"),
+      summary: task.summary || "*No completion summary*",
     });
   }
   const indexTemplate = await loadPromptFromTemplate("getTaskDetail/index.md");
