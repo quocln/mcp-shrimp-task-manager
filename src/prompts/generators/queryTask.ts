@@ -4,18 +4,12 @@
  * 負責將模板和參數組合成最終的 prompt
  * Responsible for combining templates and parameters into the final prompt
  */
-
 import {
   loadPrompt,
   generatePrompt,
   loadPromptFromTemplate,
 } from "../loader.js";
 import { Task } from "../../types/index.js";
-
-/**
- * queryTask prompt 參數介面
- * queryTask prompt parameters interface
- */
 export interface QueryTaskPromptParams {
   query: string;
   isId: boolean;
@@ -25,7 +19,6 @@ export interface QueryTaskPromptParams {
   pageSize: number;
   totalPages: number;
 }
-
 /**
  * 獲取 queryTask 的完整 prompt
  * Get the complete prompt for queryTask
@@ -38,7 +31,6 @@ export async function getQueryTaskPrompt(
   params: QueryTaskPromptParams
 ): Promise<string> {
   const { query, isId, tasks, totalTasks, page, pageSize, totalPages } = params;
-
   if (tasks.length === 0) {
     const notFoundTemplate = await loadPromptFromTemplate(
       "queryTask/notFound.md"
@@ -47,7 +39,6 @@ export async function getQueryTaskPrompt(
       query,
     });
   }
-
   const taskDetailsTemplate = await loadPromptFromTemplate(
     "queryTask/taskDetails.md"
   );
@@ -64,7 +55,6 @@ export async function getQueryTaskPrompt(
       createdAt: new Date(task.createdAt).toLocaleString(),
     });
   }
-
   const indexTemplate = await loadPromptFromTemplate("queryTask/index.md");
   const prompt = generatePrompt(indexTemplate, {
     tasksContent,
@@ -74,8 +64,5 @@ export async function getQueryTaskPrompt(
     totalTasks,
     query,
   });
-
-  // 載入可能的自定義 prompt
-  // Load possible custom prompt
   return loadPrompt(prompt, "QUERY_TASK");
 }

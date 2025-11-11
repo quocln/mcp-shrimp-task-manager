@@ -4,22 +4,15 @@
  * 負責將模板和參數組合成最終的 prompt
  * Responsible for combining templates and parameters into the final prompt
  */
-
 import {
   loadPrompt,
   generatePrompt,
   loadPromptFromTemplate,
 } from "../loader.js";
-
-/**
- * reflectTask prompt 參數介面
- * reflectTask prompt parameter interface
- */
 export interface ReflectTaskPromptParams {
   summary: string;
   analysis: string;
 }
-
 /**
  * 獲取 reflectTask 的完整 prompt
  * Get the complete reflectTask prompt
@@ -36,8 +29,5 @@ export async function getReflectTaskPrompt(
     summary: params.summary,
     analysis: params.analysis,
   });
-
-  // 載入可能的自定義 prompt
-  // Load possible custom prompt
   return loadPrompt(prompt, "REFLECT_TASK");
 }

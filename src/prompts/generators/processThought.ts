@@ -3,7 +3,6 @@ import {
   generatePrompt,
   loadPromptFromTemplate,
 } from "../loader.js";
-
 export interface ProcessThoughtPromptParams {
   thought: string;
   thoughtNumber: number;
@@ -14,7 +13,6 @@ export interface ProcessThoughtPromptParams {
   axioms_used: string[];
   assumptions_challenged: string[];
 }
-
 export async function getProcessThoughtPrompt(
   param: ProcessThoughtPromptParams
 ): Promise<string> {
@@ -28,9 +26,7 @@ export async function getProcessThoughtPrompt(
       "processThought/complatedThought.md"
     );
   }
-
   const indexTemplate = await loadPromptFromTemplate("processThought/index.md");
-
   const prompt = generatePrompt(indexTemplate, {
     thought: param.thought,
     thoughtNumber: param.thoughtNumber,
@@ -42,6 +38,5 @@ export async function getProcessThoughtPrompt(
       param.assumptions_challenged.join(", ") || "no assumptions challenged",
     nextThoughtNeeded,
   });
-
   return loadPrompt(prompt, "PROCESS_THOUGHT");
 }

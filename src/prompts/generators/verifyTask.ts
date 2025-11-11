@@ -4,24 +4,17 @@
  * 負責將模板和參數組合成最終的 prompt
  * Responsible for combining templates and parameters into the final prompt
  */
-
 import {
   loadPrompt,
   generatePrompt,
   loadPromptFromTemplate,
 } from "../loader.js";
 import { Task } from "../../types/index.js";
-
-/**
- * verifyTask prompt 參數介面
- * verifyTask prompt parameters interface
- */
 export interface VerifyTaskPromptParams {
   task: Task;
   score: number;
   summary: string;
 }
-
 /**
  * 提取摘要內容
  * Extract summary content
@@ -37,16 +30,11 @@ function extractSummary(
   maxLength: number
 ): string {
   if (!content) return "";
-
   if (content.length <= maxLength) {
     return content;
   }
-
-  // 簡單的摘要提取：截取前 maxLength 個字符並添加省略號
-  // Simple summary extraction: truncate to first maxLength characters and add ellipsis
   return content.substring(0, maxLength) + "...";
 }
-
 /**
  * 獲取 verifyTask 的完整 prompt
  * Get the complete prompt for verifyTask
@@ -82,8 +70,5 @@ export async function getVerifyTaskPrompt(
     analysisResult:
       extractSummary(task.analysisResult, 300) || "no analysis result",
   });
-
-  // 載入可能的自定義 prompt
-  // Load possible custom prompt
   return loadPrompt(prompt, "VERIFY_TASK");
 }

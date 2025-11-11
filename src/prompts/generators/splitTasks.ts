@@ -4,14 +4,12 @@
  * 負責將模板和參數組合成最終的 prompt
  * Responsible for combining templates and parameters into the final prompt
  */
-
 import {
   loadPrompt,
   generatePrompt,
   loadPromptFromTemplate,
 } from "../loader.js";
 import { Task } from "../../types/index.js";
-
 /**
  * splitTasks prompt 參數介面
  * splitTasks prompt parameter interface
@@ -21,7 +19,6 @@ export interface SplitTasksPromptParams {
   createdTasks: Task[];
   allTasks: Task[];
 }
-
 /**
  * 獲取 splitTasks 的完整 prompt
  * Get the complete splitTasks prompt
@@ -36,7 +33,6 @@ export async function getSplitTasksPrompt(
   const taskDetailsTemplate = await loadPromptFromTemplate(
     "splitTasks/taskDetails.md"
   );
-
   const tasksContent = params.createdTasks
     .map((task, index) => {
       let implementationGuide = "no implementation guide";
@@ -46,7 +42,6 @@ export async function getSplitTasksPrompt(
             ? task.implementationGuide.substring(0, 100) + "..."
             : task.implementationGuide;
       }
-
       let verificationCriteria = "no verification criteria";
       if (task.verificationCriteria) {
         verificationCriteria =
@@ -54,12 +49,9 @@ export async function getSplitTasksPrompt(
             ? task.verificationCriteria.substring(0, 100) + "..."
             : task.verificationCriteria;
       }
-
       const dependencies = task.dependencies
         ? task.dependencies
             .map((d: any) => {
-              // 查找依賴任務的名稱，提供更友好的顯示
-              // Find the name of the dependent task for more friendly display
               const depTask = params.allTasks.find((t) => t.id === d.taskId);
               return depTask
                 ? `"${depTask.name}" (\`${d.taskId}\`)`
@@ -67,7 +59,6 @@ export async function getSplitTasksPrompt(
             })
             .join(", ")
         : "no dependencies";
-
       return generatePrompt(taskDetailsTemplate, {
         index: index + 1,
         name: task.name,
@@ -80,14 +71,10 @@ export async function getSplitTasksPrompt(
       });
     })
     .join("\n");
-
   const indexTemplate = await loadPromptFromTemplate("splitTasks/index.md");
   const prompt = generatePrompt(indexTemplate, {
     updateMode: params.updateMode,
     tasksContent,
   });
-
-  // 載入可能的自定義 prompt
-  // Load possible custom prompt
   return loadPrompt(prompt, "SPLIT_TASKS");
 }
