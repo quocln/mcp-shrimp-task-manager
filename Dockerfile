@@ -16,7 +16,16 @@ COPY . .
 # Build the TypeScript code
 RUN npm run build
 
-# Expose port if necessary (not required by MCP over stdio)
+# Expose HTTP port for MCP over HTTP and UI port for web interface
+EXPOSE 3000 3001
 
-# Command to run the MCP server
-CMD [ "npm", "run", "start" ]
+# Default to HTTP mode, but can be overridden
+# Use HTTP mode: CMD ["npm", "run", "start:http"]
+# Use stdio mode: CMD ["npm", "run", "start"]
+ENV HTTP_PORT=3000
+ENV WEB_PORT=3001
+ENV MODE=http
+ENV ENABLE_GUI=true
+
+# Command to run the MCP server in HTTP mode
+CMD [ "npm", "run", "start:http" ]
